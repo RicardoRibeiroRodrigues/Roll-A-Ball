@@ -8,41 +8,69 @@ public class PlayerController : MonoBehaviour {
 	
 	// Create public variables for player speed, and for the Text UI game objects
 	public float speed;
-	private int lives;
+	private int RemainingTime;
+	private int Lives;
 	public TextMeshProUGUI countText;
 	public TextMeshProUGUI livesText;
+	public TextMeshProUGUI timeText;
+	
+    private AudioSource AudioSource;
+    public AudioClip getPoint;
+    public AudioClip getHit;
 
-	public GameObject winTextObject;
+	private GameManager Gm;
 
-    private float movementX;
-    private float movementY;
+    private float MovementX;
+    private float MovementY;
 
-	private Rigidbody rb;
-	private int count;
+	private Rigidbody Rb;
+	private int Count;
+	private float Time;
 
 	// At the start of the game..
 	void Start ()
 	{
+        Gm = FindObjectOfType<GameManager>();
 		// Assign the Rigidbody component to our private rb variable
-		rb = GetComponent<Rigidbody>();
+		Rb = GetComponent<Rigidbody>();
+		AudioSource = GetComponent<AudioSource>();
 
 		// Set the count to zero 
-		count = 0;
-		lives = 2;
+		Count = 0;
+		RemainingTime = 60;
+		Lives = 3;
 
 		SetCountText();
 		SetLivesText();
+	}
 
-        // Set the text property of the Win Text UI to an empty string, making the 'You Win' (game over message) blank
-        winTextObject.SetActive(false);
+	void Update()
+	{
+		Time += UnityEngine.Time.deltaTime;
+		// Run every 1 sec.
+		if (Time >= 1.0) 
+		{
+			Time = 0.0f;
+			RemainingTime--;
+			if (RemainingTime <= 0) 
+			{
+				Gm.EndGame(false, "Time is up, you lose");
+			}
+			timeText.text = "Time: " + RemainingTime.ToString() + "s";
+		}
 	}
 
 	void FixedUpdate()
 	{
 		// Create a Vector3 variable, and assign X and Z to feature the horizontal and vertical float variables above
-		Vector3 movement = new Vector3 (movementX, 0.0f, movementY);
+		Vector3 movement = new Vector3 (MovementX, 0.0f, MovementY);
 
-		rb.AddForce(movement * speed);
+		Rb.AddForce(movement * speed);
+
+		if (transform.position.y < -1)
+		{
+			Gm.StartGame(Gm.GetSpeed());
+		}
 	}
 
 	void OnTriggerEnter(Collider other) 
@@ -50,20 +78,42 @@ public class PlayerController : MonoBehaviour {
 		// ..and if the GameObject you intersect has the tag 'Pick Up' assigned to it..
 		if (other.gameObject.CompareTag ("PickUp"))
 		{
-			other.gameObject.SetActive (false);
+			// Play the point sound
+			AudioSource.PlayOneShot(getPoint, 0.5f);
+			other.gameObject.SetActive(false);
 
 			// Add one to the score variable 'count'
-			count++;
+			Count++;
 
 			// Run the 'SetCountText()' function (see below)
 			SetCountText();
 		}
 		if (other.gameObject.CompareTag("Enemy"))
 		{
-			// The enemy dissapears ?
-			// other.gameObject.SetActive(false);
+			// Play the hit sound
+			AudioSource.PlayOneShot(getHit, 0.8f);
+			Lives--;
+			// Teleports the enemy to a place near, to give time to the player to run from it.
+			Vector3 enemyPos = other.gameObject.transform.position;
+			float movX = UnityEngine.Random.Range(6f, 8f);
+			float movZ = UnityEngine.Random.Range(6f, 8f);
 
-			lives--;
+			if (enemyPos.x >= 0)
+			{
+				movX = -movX;
+			}
+			if (enemyPos.z >= 0)
+			{
+				movZ = -movZ;
+			}
+			Vector3 movement = new Vector3(movX, 0.0f, movZ);
+			other.gameObject.transform.Translate(movement);
+			
+			// If the player is out of lives, the game ends.
+			if (Lives <= 0)
+			{
+				Gm.EndGame(false , "Out of lives, you lose");
+			}
 			SetLivesText();
 		}
 	}
@@ -72,24 +122,23 @@ public class PlayerController : MonoBehaviour {
     {
         Vector2 v = value.Get<Vector2>();
 
-        movementX = v.x;
-        movementY = v.y;
+        MovementX = v.x;
+        MovementY = v.y;
     }
 
     void SetCountText()
 	{
-		countText.text = "Count: " + count.ToString();
+		countText.text = "Count: " + Count.ToString();
 
-		if (count >= 12) 
+		if (Count >= 12) 
 		{
-            // Set the text value of your 'winText'
-            winTextObject.SetActive(true);
+			Gm.EndGame(true, "You got all pickups, you win!!");
 		}
 	}
 
 	void SetLivesText()
 	{
 		// livesText.text = string.Join("❤️", new string[lives + 1]);
-		livesText.text = "Lives: " + lives.ToString();
+		livesText.text = "Lives: " + Lives.ToString();
 	}
 }
