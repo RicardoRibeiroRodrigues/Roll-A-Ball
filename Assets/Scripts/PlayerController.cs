@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour {
 
 		// Set the count to zero 
 		Count = 0;
-		RemainingTime = 35;
+		RemainingTime = 40;
 		Lives = 3;
 
 		SetCountText();
