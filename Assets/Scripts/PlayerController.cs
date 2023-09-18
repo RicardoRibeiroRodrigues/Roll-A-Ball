@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour {
 
 		// Set the count to zero 
 		Count = 0;
-		RemainingTime = 60;
+		RemainingTime = 35;
 		Lives = 3;
 
 		SetCountText();
@@ -138,7 +138,6 @@ public class PlayerController : MonoBehaviour {
 
 	void SetLivesText()
 	{
-		// livesText.text = string.Join("❤️", new string[lives + 1]);
 		livesText.text = "Lives: " + Lives.ToString();
 	}
 }

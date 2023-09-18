@@ -5,6 +5,7 @@ public class MenuManager : MonoBehaviour
 {
     private GameManager GameManager;
     public TextMeshProUGUI endMessage;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -14,6 +15,11 @@ public class MenuManager : MonoBehaviour
 
     public void GmStartGame(float speed) {
         GameManager.StartGame(speed);
+    }
+
+    public void GmReturnMainMenu()
+    {
+        GameManager.ReturnMainMenu();
     }
 
 }

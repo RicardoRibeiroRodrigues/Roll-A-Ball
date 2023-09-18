@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
     private AudioSource AudioSource;
     public AudioClip gameOverSound;
     public AudioClip winSound;
+    public GameObject mainMenu;
+    public GameObject howToPlayMenu;
 
     private void Start()
     {
@@ -20,12 +22,14 @@ public class GameManager : MonoBehaviour
     {
         AudioSource.PlayOneShot(win ? winSound : gameOverSound, 1f);
         EndMessage = message;
-        StartCoroutine(ChangeSceneInSecs(0.5f, "GameFinish"));
+        Time.timeScale = 0;
+        StartCoroutine(ChangeSceneInSecs(0.6f, "GameFinish"));
     }
 
     IEnumerator ChangeSceneInSecs(float nSecs, string scene)
     {
         yield return new WaitForSecondsRealtime(nSecs);
+        Time.timeScale = 1;
         SceneManager.LoadScene(scene);
     }
 
@@ -43,6 +47,23 @@ public class GameManager : MonoBehaviour
     public float GetSpeed()
     {
         return Speed;
+    }
+
+    public void ReturnMainMenu()
+    {
+        StartCoroutine(ChangeSceneInSecs(0.3f, "MainMenu"));
+    }
+
+    public void ShowHowToPlayMenu()
+    {
+        mainMenu.SetActive(false);
+        howToPlayMenu.SetActive(true);
+    }
+
+    public void HideHowToPlayMenu()
+    {
+        mainMenu.SetActive(true);
+        howToPlayMenu.SetActive(false);
     }
 
     private void Awake()
