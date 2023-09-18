@@ -1,6 +1,6 @@
 # Roll-A-Ball
 Implementation of the [Unity tutorial](https://learn.unity.com/project/roll-a-ball) with some additions:
-- Time Mechanics: The player has 25 seconds to collect all the points.
+- Time Mechanics: The player has 40 seconds to collect all the points.
 - Enemy: There is another sphere that pursues the player and deals damage when it touches them.
 - Music and Sound Effects: The game features various sound effects and music, a complete list below.
 - Menus: The game includes a basic initial menu and a menu for when the game ends.
